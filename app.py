@@ -70,16 +70,27 @@ def recommend_content(anime):
 
 def recommend_collab(anime_name):
 
-    anime_index = np.where(
-        pt.index == anime_name
-    )[0][0]
+    # Check if anime exists in collaborative dataset
+    if anime_name not in pt.index:
+
+        st.warning(
+           """
+        This anime is not available in the Collaborative Filtering dataset.
+
+        Collaborative Filtering was trained only on popular anime with sufficient user ratings.
+        During model optimization, less-rated anime were removed to reduce model size and
+        make deployment possible.
+
+        You can still get recommendations using the Content-Based Recommender.
+        """
+        )
+
+        return [], []
+
+    anime_index = np.where(pt.index == anime_name)[0][0]
 
     distances, suggestions = model.kneighbors(
-        pt.iloc[anime_index, :]
-        .values
-        .reshape(1, -1),
-        n_neighbors=6
-    )
+        pt.iloc[anime_index, :].values.reshape(1, -1),n_neighbors=6)
 
     recommendations = []
     posters = []
@@ -165,6 +176,9 @@ if st.button("Recommend"):
         names, posters = recommend_hybrid(
             selected_anime
         )
+    # Stop if no recommendations returned
+    if not names:
+        st.stop()
 
     st.subheader("Recommended Anime")
 

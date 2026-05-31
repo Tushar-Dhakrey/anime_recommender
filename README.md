@@ -1,123 +1,167 @@
 # Anime Recommendation System
 
+A Machine Learning-based Anime Recommendation System that recommends anime using multiple recommendation techniques and displays anime posters using the Jikan API.
+
+## Live Demo
+
+🔗 **Deployed Application**
+https://animerecommender-48vcz3ilp4qrkgilaxpsij.streamlit.app/
+
+---
+
 ## Project Overview
 
-This project implements an Anime Recommendation System using multiple recommendation techniques. The system recommends anime based on genre similarity, user rating behavior, and a hybrid approach that combines both methods.
+This project implements three recommendation approaches:
 
-The project also includes a Streamlit web application that allows users to interactively discover anime recommendations along with anime posters fetched using the Jikan API.
+* Content-Based Filtering
+* Collaborative Filtering (KNN)
+* Hybrid Recommendation System
+
+The application allows users to select an anime and receive recommendations using different recommendation strategies.
+
+Anime posters are fetched dynamically using the Jikan API and displayed through an interactive Streamlit web application.
 
 ---
 
 ## Features
 
 * Content-Based Recommendation System
-* Collaborative Filtering using K-Nearest Neighbors (KNN)
+* Collaborative Filtering using KNN
 * Hybrid Recommendation System
-* Interactive Streamlit Web Application
 * Anime Poster Integration using Jikan API
-* Genre-Based Similarity Search
-* User Rating-Based Recommendations
+* Interactive Streamlit Interface
+* Cloud Deployment using Streamlit Community Cloud
+
+---
+
+## Recommendation Techniques
+
+### 1. Content-Based Filtering
+
+Content-Based Filtering recommends anime based on genre similarity.
+
+#### Technologies Used
+
+* CountVectorizer
+* Cosine Similarity
+* Feature Engineering
+
+#### Working
+
+Genres are converted into numerical vectors using CountVectorizer.
+
+Example:
+
+```text
+Death Note
+→ Mystery, Psychological, Supernatural
+```
+
+Anime with similar genre vectors receive higher similarity scores and are recommended to the user.
+
+---
+
+### 2. Collaborative Filtering
+
+Collaborative Filtering recommends anime based on user rating behavior.
+
+#### Technologies Used
+
+* User-Anime Rating Matrix
+* Sparse Matrix Representation
+* K-Nearest Neighbors (KNN)
+* Cosine Distance
+
+#### Working
+
+Users who rate anime similarly are grouped together.
+
+Example:
+
+```text
+Users who liked Death Note
+also liked Monster
+```
+
+Recommendations are generated based on rating patterns instead of anime genres.
+
+#### Dataset Optimization
+
+To reduce model size and enable deployment:
+
+* Inactive users were removed.
+* Anime with very few ratings were removed.
+* The pivot table was rebuilt using the filtered dataset.
+
+This significantly reduced memory usage while maintaining useful recommendations for popular anime.
+
+#### Note
+
+Collaborative Filtering is available only for anime present in the filtered dataset.
+
+If an anime does not have sufficient rating data, the application displays a message and users can still use the Content-Based Recommender.
+
+---
+
+### 3. Hybrid Recommendation System
+
+The Hybrid Recommendation System combines:
+
+* Content-Based Recommendations
+* Collaborative Filtering Recommendations
+
+This helps improve recommendation diversity and overall recommendation quality.
 
 ---
 
 ## Dataset
 
-Dataset files:
+Files Used:
 
 * anime.csv
 * rating.csv
 
 The dataset contains:
 
-* Anime titles
+* Anime Information
 * Genres
-* Community ratings
-* User ratings
-* Anime metadata
+* User Ratings
+* Anime Ratings
+* User Interactions
 
 ---
 
 ## Technologies Used
 
-* Python
-* Pandas
-* NumPy
+### Machine Learning
+
 * Scikit-Learn
-* Streamlit
-* Requests
-* Jupyter Notebook
-
----
-
-## Content-Based Filtering
-
-The content-based recommender uses anime genres to identify similar anime.
-
-### Techniques Used
-
-* Genre Preprocessing
+* K-Nearest Neighbors (KNN)
 * CountVectorizer
 * Cosine Similarity
 
-The system recommends anime with similar content and genre characteristics.
+### Data Processing
 
----
+* Pandas
+* NumPy
+* SciPy
 
-## Collaborative Filtering
+### Web Application
 
-The collaborative recommender learns from user rating patterns.
+* Streamlit
 
-### Techniques Used
+### API Integration
 
-* User-Anime Pivot Table
-* Sparse Matrix Representation
-* K-Nearest Neighbors (KNN)
+* Jikan API
 
-The system recommends anime that are liked by users with similar preferences.
+### Version Control
 
----
+* Git
+* GitHub
 
-## Hybrid Recommendation System
+### Deployment
 
-The hybrid recommender combines:
-
-* Content-Based Recommendations
-* Collaborative Filtering Recommendations
-
-Duplicate recommendations are removed to generate a stronger final recommendation list.
-
----
-
-## Streamlit Web Application
-
-The project includes a Streamlit-based web application.
-
-### Features
-
-* Anime Selection Dropdown
-* Content-Based Recommendations
-* Collaborative Recommendations
-* Hybrid Recommendations
-* Anime Poster Display
-* Interactive User Interface
-
-### Run the Application
-
-```bash
-streamlit run app.py
-```
-
----
-
-## API Integration
-
-This project uses the Jikan API to fetch anime posters dynamically from MyAnimeList.
-
-The API is used to:
-
-* Search anime information
-* Retrieve anime poster URLs
-* Display posters in the Streamlit application
+* Streamlit Community Cloud
 
 ---
 
@@ -127,14 +171,158 @@ The API is used to:
 anime_recommender/
 │
 ├── app.py
-├── anime_recommand.ipynb
-├── anime.csv
-├── rating.csv
-├── README.md
 ├── requirements.txt
-└── .gitignore
+├── README.md
+│
+└── model/
+    ├── anime.pkl
+    ├── vectors.pkl
+    ├── pivot_table.pkl
+    └── knn_model_df.pkl
 ```
+
+---
+
+## Optimization Performed
+
+### Content-Based Optimization
+
+Initially, the project stored a complete similarity matrix.
+
+```python
+similarity = cosine_similarity(vectors)
+```
+
+This produced a very large file because similarities between every pair of anime were stored.
+
+Optimization:
+
+* Stored vectors instead of the complete similarity matrix.
+* Calculated cosine similarity dynamically during runtime.
+* Reduced storage requirements significantly.
+* Maintained recommendation quality.
+
+### Collaborative Filtering Optimization
+
+The original pivot table contained a very large number of users and anime.
+
+Optimization:
+
+* Filtered inactive users.
+* Filtered anime with low interaction counts.
+* Reduced pivot table size.
+* Reduced model storage requirements.
+
+### Deployment Optimization
+
+Model files were optimized to reduce storage usage and improve deployment performance.
+
+Final model files:
+
+* anime.pkl
+* vectors.pkl
+* pivot_table.pkl
+* knn_model_df.pkl
+
+---
+
+## Challenges Faced
+
+### Large Model Files
+
+The original similarity matrix occupied hundreds of megabytes.
+
+Solution:
+
+* Replaced similarity matrix storage with vector storage.
+* Generated similarity scores dynamically when recommendations are requested.
+
+### DataFrame Index Mismatch
+
+An indexing issue occurred because DataFrame indices did not align with similarity matrix rows.
+
+Solution:
+
+```python
+anime_df = anime_df.reset_index(drop=True)
+```
+
+This ensured that anime indices matched the corresponding vector positions.
+
+### Deployment Constraints
+
+Large model files made deployment difficult.
+
+Solution:
+
+* Optimized datasets.
+* Reduced model size.
+* Filtered low-interaction records.
+* Used runtime similarity calculations.
+
+---
+
+## How to Run Locally
+
+Clone the repository:
+
+```bash
+git clone https://github.com/Tushar-Dhakrey/anime_recommender.git
+```
+
+Move into the project directory:
+
+```bash
+cd anime_recommender
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the application:
+
+```bash
+streamlit run app.py
+```
+
+---
+
+## Skills Demonstrated
+
+* Data Cleaning
+* Data Preprocessing
+* Feature Engineering
+* Content-Based Recommendation Systems
+* Collaborative Filtering
+* Hybrid Recommendation Systems
+* API Integration
+* Streamlit Development
+* Git & GitHub
+* Model Optimization
+* Cloud Deployment
+* Debugging & Problem Solving
+
+---
+
+## Future Scope
+
+Potential improvements include:
+
+* Personalized user accounts
+* User authentication
+* Advanced recommendation ranking
+* Deep Learning-based recommendation models
+* User watchlist functionality
+
+---
 
 ## Author
 
-Tushar Dhakrey
+**Tushar Dhakrey**
+
+GitHub: https://github.com/Tushar-Dhakrey
+
+LinkedIn: Add Your LinkedIn Profile Here

@@ -5,11 +5,11 @@ import requests
 
 # Load Pickle Files
 
-anime_df = pickle.load(open('anime_df.pkl', 'rb'))
-similarity = pickle.load(open('similarity.pkl', 'rb'))
+anime_df = pickle.load(open('model/anime.pkl', 'rb'))
+vectors = pickle.load(open('model/vectors.pkl', 'rb'))
 
-pt = pickle.load(open('pivot_table.pkl', 'rb'))
-model = pickle.load(open('knn_model.pkl', 'rb'))
+pt = pickle.load(open('model/pivot_table.pkl', 'rb'))
+model = pickle.load(open('model/knn_model_df.pkl', 'rb'))
 
 # Fetch Anime Poster
 
@@ -38,7 +38,10 @@ def recommend_content(anime):
         anime_df['name'] == anime
     ].index[0]
 
-    distances = similarity[anime_index]
+    ##distances = similarity[anime_index]
+    from sklearn.metrics.pairwise import cosine_similarity
+
+    distances = cosine_similarity(vectors[anime_index].reshape(1, -1),vectors)[0]
 
     anime_list = sorted(
         list(enumerate(distances)),
